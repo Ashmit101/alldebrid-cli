@@ -46,8 +46,8 @@ namespace alldebrid {
 				cpr::Parameters{
 				  {"agent", agent_},
 				  {"apikey", api_key_},
-				  {"links": {url}}
-				})
+				  {"links", url}
+				});
       if (r.status_code == 0) {
 	return false;
       }
@@ -58,7 +58,11 @@ namespace alldebrid {
       if (j.contains("status") && j["status"] == "success") {
 	  return true;
 	}
+    } catch (const json::exception& e) {
+      return false;
     }
+
+    return false;
   }
 
 } // namespace alldebrid
