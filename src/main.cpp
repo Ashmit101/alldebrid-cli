@@ -2,8 +2,22 @@
 #include <cstdlib>
 #include <string>
 #include <unistd.h>
+#include <boost/program_options.hpp>
 
 #include "alldebrid.h"
+
+
+boost::program_options::variables_map parse_options(int argc, char* argv[]) {
+  using namespace boost::program_options;
+
+  options_description desc("Allowed options");
+  desc.add_options()("save", "saved link debrid service");
+  variables_map vm;
+  store(parse_command_line(argc, argv, desc), vm);
+  notify(vm);
+
+  return vm;  
+}
 
 int main(int argc, char* argv[]) {
   const char* api_key_env = std::getenv("ALLDEBRID_API_KEY");
@@ -14,6 +28,9 @@ int main(int argc, char* argv[]) {
 	      << "export ALLDEBRID_API_KEY='your_api_key_here'\n";
     return 1;
   }
+
+  auto vm = parse_options(argc, argv);
+  
   alldebrid::Client client(api_key_env, "my_cpp_cli");
 
   if (!isatty(STDIN_FILENO)) {

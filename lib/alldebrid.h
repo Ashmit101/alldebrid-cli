@@ -18,6 +18,8 @@ namespace alldebrid {
         // Performs the HTTP request to unlock the link
         UnlockResult unlock_link(const std::string& url);
 
+      bool save_link(const std::string& url);
+
     private:
         std::string api_key_;
         std::string agent_;
