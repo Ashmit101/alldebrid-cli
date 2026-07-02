@@ -41,4 +41,28 @@ namespace alldebrid {
         }
     }
 
+  bool Client::save_link(const std::string& url) {
+    cpr::Response r = cpr::Post(cpr::Url{base_url_ + "user/links/save"},
+				cpr::Parameters{
+				  {"agent", agent_},
+				  {"apikey", api_key_},
+				  {"links", url}
+				});
+      if (r.status_code == 0) {
+	return false;
+      }
+
+    try{
+      json j = json::parse(r.text);
+
+      if (j.contains("status") && j["status"] == "success") {
+	  return true;
+	}
+    } catch (const json::exception& e) {
+      return false;
+    }
+
+    return false;
+  }
+
 } // namespace alldebrid

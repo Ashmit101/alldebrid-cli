@@ -19,6 +19,17 @@ FetchContent_Declare(json
 )
 FetchContent_MakeAvailable(json)
 
+# Fetch boost
+FetchContent_Declare(Boost
+    GIT_REPOSITORY https://github.com/boostorg/boost.git
+    GIT_SHALLOW 1
+    GIT_TAG boost-1.91.0-1
+)
+set(BOOST_INCLUDE_LIBRARIES program_options)
+set(BOOST_ENABLE_CMAKE ON)
+
+FetchContent_MakeAvailable(Boost)
+
 # Add subdirectories
 add_subdirectory(lib)
 add_subdirectory(src)
