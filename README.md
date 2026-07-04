@@ -39,3 +39,8 @@ You can also pipe the links:
 ```
 adcli --save <link>
 ```
+
+### Upload magnet link
+```
+adcli --magnet "<link>"
+```
