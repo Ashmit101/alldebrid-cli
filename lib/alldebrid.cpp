@@ -1,7 +1,9 @@
 #include "alldebrid.h"
+#include "cpr/parameters.h"
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <stdexcept>
 
 using json = nlohmann::json;
 
@@ -63,6 +65,38 @@ namespace alldebrid {
     }
 
     return false;
+  }
+
+  MagnetResult Client::upload_magnet(const std::string &magnet_link) {
+    cpr::Url url{base_url_ + "magnet/upload"};
+    cpr::Parameters parameters{
+        {"magnets", magnet_link}, {"agent", agent_}, {"apikey", api_key_}};
+    cpr::Response r = cpr::Post(url, parameters);
+
+      if (r.status_code == 0) {
+	throw std::runtime_error("Error uploading magnet!");
+      }
+
+    try{
+      json j = json::parse(r.text);
+
+      if (j.contains("status") && j["status"] == "success") {
+        auto magnets = j["data"]["magnets"];
+        auto magnet = magnets[0];
+	return MagnetResult{
+          magnet["magnet"], magnet["name"], magnet["id"], magnet["hash"],
+              magnet["size"],
+magnet["ready"]              
+          };
+      } else {
+	throw std::runtime_error("Error getting the data!");
+        }
+    } catch (const json::exception& e) {
+      throw std::runtime_error("Error parsing json response!");
+    } catch (const std::runtime_error &e) {
+      std::cerr << "Error uploading magnet!";
+    }
+    throw std::runtime_error("SHould not have come this far!")    ;
   }
 
 } // namespace alldebrid
