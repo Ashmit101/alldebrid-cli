@@ -1,5 +1,4 @@
-#include "alldebrid.h"
-#include "cpr/parameters.h"
+#include "include/alldebrid.h"
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include <iostream>
