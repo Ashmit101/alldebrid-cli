@@ -1,7 +1,13 @@
 # AllDebrid cli
 
 ## Prerequisite
-This project currently supports [AllDebrid](alldebrid.com) service. So you need an API key for it saved in environment variable named `ALLDEBRID_API_KEY`. 
+This project currently supports [AllDebrid](alldebrid.com) service. So you need an API key for it saved in environment variable named `ALLDEBRID_API_KEY`.
+
+### Dependencies
+#### Fedora Linux
+```
+sudo dnf install openssl-devel cmake
+```
 
 ## Build
 This project uses cmake to build. Run following commands:

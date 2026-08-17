@@ -12,10 +12,8 @@ namespace alldebrid {
 
     class Client {
     public:
-        // Requires an API key. Agent is optional but recommended by AllDebrid.
         explicit Client(std::string api_key, std::string agent = "cli_tool");
 
-        // Performs the HTTP request to unlock the link
         UnlockResult unlock_link(const std::string& url);
 
       bool save_link(const std::string& url);
