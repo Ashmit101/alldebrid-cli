@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 
   if (magnet) {
     auto magnet_object = client.upload_magnet(target_url);
-    std::cout << magnet_object.name << " " << magnet_object.size << " " << magnet_object.ready << "\n";
+    std::cout << magnet_object;
   } else if (save) {
     auto result = client.save_link(target_url);
 

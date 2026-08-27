@@ -98,4 +98,46 @@ magnet["ready"]
     throw std::runtime_error("SHould not have come this far!")    ;
   }
 
+  FilesAndLinks Client::download_links(int* id) {
+    auto response = send_request("magnet/files");
+    auto files = response["data"]["magnets"][0]["files"];
+
+    FilesAndLinks filesAndLinks{id};
+
+    for (auto file: files) {
+      auto name = file["n"].get<std::string>();
+    }
+    
+  }
+
+    json send_request(std::string &url,
+		      cpr::Parameters &parameters) {
+      cpr::Url url{base_url_ + url};
+      parameters.Add({"agent", agent_}, {"apikey", api_key_});
+      cpr::Response r = cpr::Post(url, parameters);
+
+      try {
+	json j = json::parse(r.text);
+	return j;
+      } catch (const json::exception& e) {
+	throw std::runtime_error("Invalid json");
+      }
+    }
+
+  std::ostream& operator<<(std::ostream& s, const MagnetResult& result) {
+    s << "ID: " << result.id << "\n";
+    s << "Name: " << result.name << "\n";
+    s << "Size: " << result.size << "\n";
+    s << "Ready: ";
+
+    if (result.ready) {
+      s << "True";
+    } else {
+      s << "False";
+    }
+    s << "\n";
+
+    return s;
+  }
+
 } // namespace alldebrid
