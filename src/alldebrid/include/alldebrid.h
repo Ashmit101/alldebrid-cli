@@ -25,12 +25,16 @@ namespace alldebrid {
 
   struct Node{
     std::string n;		// Name
+    explicit Node(std::string name) : n(std::move(name)) {}
+    virtual ~Node() = default;
   };
 
   struct FolderNode : Node {
-    std::vector<Node> e;	// Sub nodes
+    std::vector<Node*> e;	// Sub nodes
 
-    void addSubNode(Node &node) {
+    using Node::Node;
+
+    void addSubNode(Node* node) {
       e.push_back(node);
     }
   };
@@ -38,17 +42,20 @@ namespace alldebrid {
   struct FileNode : Node {
     int s;			// File Size
     std::string l; 		// Download link
+
+    FileNode(std::string name, int size, std::string link) :
+      Node(std::move(name)), s(size), l(std::move(link)) {}
   };
 
   struct FilesAndLinks {
     int id;
-    std::vector<Node> files;
+    std::vector<Node*> files;
 
     FilesAndLinks(int id) {
       this->id = id;
     }
 
-    void addNode(Node &node) {
+    void addNode(Node* node) {
       files.push_back(node);
     }
 

@@ -85,8 +85,15 @@ int main(int argc, char* argv[]) {
 
   if(vm.count("id")) {
     const auto magnet_id = vm["id"].as<int>();
-    std::cout << "Magent id: " << magnet_id << "\n";
-    auto magnet_object = client.download_links(magnet_id);
+    auto files_and_links = client.download_links(magnet_id);
+
+    std::cout << "Id: " << files_and_links.id << "\n";
+    for (auto file : files_and_links.files ) {
+      std::cout << "Name: " << file->n << "\n";
+      if (auto* node = dynamic_cast<alldebrid::FileNode*>(file)) {
+	std::cout << "Link: " << node->l << "\n";
+      }
+    }
     return 0;
   }
 

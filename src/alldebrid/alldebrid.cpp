@@ -99,25 +99,34 @@ magnet["ready"]
     throw std::runtime_error("SHould not have come this far!")    ;
   }
 
+  FilesAndLinks parse_files(const int& id, const json& files) {
+    FilesAndLinks filesAndLinks{id};
+
+    for (auto file: files) {
+      auto name = file["n"].get<std::string>();
+      if (file.contains("s")) {
+	FileNode* fileNode = new FileNode(name,
+						   file["s"].get<int>(),
+						   file["l"].get<std::string>());
+
+      filesAndLinks.addNode(fileNode);
+      }
+
+      }
+    return filesAndLinks;
+  }
+
+
   FilesAndLinks Client::download_links(const int &id) {
     cpr::Parameters parameters{{"id[]", std::to_string(id)}};
     auto response = send_request("magnet/files",
 				 parameters);
 
-    std::cout << "Response: \n";
-    std::cout << response;
-    
     auto files = response["data"]["magnets"][0]["files"];
 
-    FilesAndLinks filesAndLinks{id};
-
-    for (auto file: files) {
-      auto name = file["n"].get<std::string>();
-    }
-
-    return filesAndLinks;
-    
+    return parse_files(id, files);
   }
+
 
   json Client::send_request(const std::string &url,
 		    cpr::Parameters &parameters) {
