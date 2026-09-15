@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
 using json = nlohmann::json;
 
@@ -98,8 +99,14 @@ magnet["ready"]
     throw std::runtime_error("SHould not have come this far!")    ;
   }
 
-  FilesAndLinks Client::download_links(int* id) {
-    auto response = send_request("magnet/files");
+  FilesAndLinks Client::download_links(const int &id) {
+    cpr::Parameters parameters{{"id[]", std::to_string(id)}};
+    auto response = send_request("magnet/files",
+				 parameters);
+
+    std::cout << "Response: \n";
+    std::cout << response;
+    
     auto files = response["data"]["magnets"][0]["files"];
 
     FilesAndLinks filesAndLinks{id};
@@ -107,22 +114,42 @@ magnet["ready"]
     for (auto file: files) {
       auto name = file["n"].get<std::string>();
     }
+
+    return filesAndLinks;
     
   }
 
-    json send_request(std::string &url,
-		      cpr::Parameters &parameters) {
-      cpr::Url url{base_url_ + url};
-      parameters.Add({"agent", agent_}, {"apikey", api_key_});
-      cpr::Response r = cpr::Post(url, parameters);
+  json Client::send_request(const std::string &url,
+		    cpr::Parameters &parameters) {
+    cpr::Url fullUrl{base_url_ + url};
+    parameters.Add({"agent", agent_});
+    parameters.Add({"apikey", api_key_});
 
-      try {
-	json j = json::parse(r.text);
-	return j;
-      } catch (const json::exception& e) {
-	throw std::runtime_error("Invalid json");
-      }
+    cpr::Response r = cpr::Post(fullUrl, parameters);
+
+    try {
+      json j = json::parse(r.text);
+      return j;
+    } catch (const json::exception& e) {
+      throw std::runtime_error("Invalid json");
     }
+  }
+
+  json Client::send_request(const std::string &url) {
+    cpr::Url fullUrl{base_url_ + url};
+    cpr::Parameters parameters{};
+    parameters.Add({"agent", agent_});
+    parameters.Add({"apikey", api_key_});
+    
+    cpr::Response r = cpr::Post(fullUrl, parameters);
+
+    try {
+      json j = json::parse(r.text);
+      return j;
+    } catch (const json::exception& e) {
+      throw std::runtime_error("Invalid json");
+    }
+  }
 
   std::ostream& operator<<(std::ostream& s, const MagnetResult& result) {
     s << "ID: " << result.id << "\n";

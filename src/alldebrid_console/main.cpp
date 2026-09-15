@@ -14,7 +14,11 @@ boost::program_options::variables_map parse_options(int argc, char* argv[], bool
   bool is_help{};
 
   options_description desc("adcli [--save] link");
-  desc.add_options()("save,s", bool_switch(&save), "saved link debrid service")("help,h", bool_switch(&is_help), "display a help dialog")("magnet,m", bool_switch(&magnet), "upload magnet link")
+  desc.add_options()
+    ("save,s", bool_switch(&save), "saved link debrid service")
+    ("help,h", bool_switch(&is_help), "display a help dialog")
+    ("magnet,m", bool_switch(&magnet), "upload magnet link")
+    ("id,i", value<int>(), "download files with magnet id")
     ("link", value<std::string>(), "link to save or unlock");
 
   positional_options_description positional{};
@@ -76,6 +80,13 @@ int main(int argc, char* argv[]) {
       }
       
     }
+    return 0;
+  }
+
+  if(vm.count("id")) {
+    const auto magnet_id = vm["id"].as<int>();
+    std::cout << "Magent id: " << magnet_id << "\n";
+    auto magnet_object = client.download_links(magnet_id);
     return 0;
   }
 
