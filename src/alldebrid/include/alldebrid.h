@@ -34,6 +34,10 @@ namespace alldebrid {
 
     using Node::Node;
 
+    FolderNode(std::string name,
+	       std::vector<Node*> subNodes) : Node(name),
+					      e(subNodes) {}
+
     void addSubNode(Node* node) {
       e.push_back(node);
     }
@@ -55,8 +59,14 @@ namespace alldebrid {
       this->id = id;
     }
 
+    FilesAndLinks(int id, std::vector<Node*> files) : id(id), files(files) {}
+
     void addNode(Node* node) {
       files.push_back(node);
+    }
+
+    ~FilesAndLinks() {
+      for (auto* file: files) delete file;
     }
 
   };
@@ -81,5 +91,5 @@ namespace alldebrid {
   };
 
   std::ostream& operator<<(std::ostream&, const MagnetResult&);
-
+  std::ostream& operator<<(std::ostream&, const Node*);
 } // namespace alldebrid

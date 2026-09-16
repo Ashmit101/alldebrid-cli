@@ -99,21 +99,25 @@ magnet["ready"]
     throw std::runtime_error("SHould not have come this far!")    ;
   }
 
-  FilesAndLinks parse_files(const int& id, const json& files) {
-    FilesAndLinks filesAndLinks{id};
+  std::vector<Node*> parse_files(const json& files) {
+    std::vector<Node*> nodes;
 
     for (auto file: files) {
       auto name = file["n"].get<std::string>();
       if (file.contains("s")) {
 	FileNode* fileNode = new FileNode(name,
-						   file["s"].get<int>(),
-						   file["l"].get<std::string>());
+					  file["s"].get<int>(),
+					  file["l"].get<std::string>());
 
-      filesAndLinks.addNode(fileNode);
+	nodes.push_back(fileNode);
+      } else {
+	FolderNode* folderNode = new FolderNode(name,
+						parse_files(file["e"]));
+	nodes.push_back(folderNode);
       }
 
-      }
-    return filesAndLinks;
+    }
+    return nodes;
   }
 
 
@@ -124,7 +128,8 @@ magnet["ready"]
 
     auto files = response["data"]["magnets"][0]["files"];
 
-    return parse_files(id, files);
+    auto filesAndFolders = parse_files(files);
+    return FilesAndLinks(id, filesAndFolders);
   }
 
 
@@ -172,6 +177,20 @@ magnet["ready"]
       s << "False";
     }
     s << "\n";
+
+    return s;
+  }
+
+  std::ostream& operator<<(std::ostream& s, const Node* node) {
+    s << node->n << "\n";
+    if (auto* file = dynamic_cast<const FileNode*>(node)) {
+      s << "Link: " << file->l << "\n";
+      s << "Size: " << file->s << "\n";
+    } else if (auto* folder = dynamic_cast<const FolderNode*>(node)) {
+      for (const auto* file : folder->e) {
+	s << file << "\n";
+      }
+    }
 
     return s;
   }

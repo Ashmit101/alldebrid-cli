@@ -88,11 +88,8 @@ int main(int argc, char* argv[]) {
     auto files_and_links = client.download_links(magnet_id);
 
     std::cout << "Id: " << files_and_links.id << "\n";
-    for (auto file : files_and_links.files ) {
-      std::cout << "Name: " << file->n << "\n";
-      if (auto* node = dynamic_cast<alldebrid::FileNode*>(file)) {
-	std::cout << "Link: " << node->l << "\n";
-      }
+    for (const auto file: files_and_links.files) {
+      std::cout << file ;
     }
     return 0;
   }
@@ -102,6 +99,19 @@ int main(int argc, char* argv[]) {
   if (magnet) {
     auto magnet_object = client.upload_magnet(target_url);
     std::cout << magnet_object;
+    if (magnet_object.ready) {
+      std::cout << "Download? (y/n) ";
+      char input;
+      std::cin >> input;
+
+      if (input == 'y') {
+	auto files_and_links = client.download_links(magnet_object.id);
+	for (const auto file: files_and_links.files) {
+	  std::cout << file;
+	}
+      }
+      return 0;
+    }
   } else if (save) {
     auto result = client.save_link(target_url);
 
