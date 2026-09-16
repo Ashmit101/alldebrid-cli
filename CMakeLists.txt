@@ -1,35 +1,38 @@
-cmake_minimum_required(VERSION 3.14)
-project(AllDebridCLI CXX)
+cmake_minimum_required(VERSION 3.30.0)
+project(AllDebridCLI VERSION 0.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Fetch CPR (HTTP Library)
 include(FetchContent)
-FetchContent_Declare(cpr
-    GIT_REPOSITORY https://github.com/libcpr/cpr.git
-    GIT_TAG 1.10.5
-)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CPR_USE_SYSTEM_LIB_PSL ON CACHE BOOL "" FORCE)
+FetchContent_Declare(cpr GIT_REPOSITORY https://github.com/libcpr/cpr.git
+                         GIT_TAG 1.14.2)
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(cpr)
 
-# Fetch nlohmann/json
-FetchContent_Declare(json
-    GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG v3.11.3
-)
-FetchContent_MakeAvailable(json)
+find_package(nlohmann_json QUIET)
+if(NOT nlohmann_json_FOUND)
+  FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json
+    GIT_TAG v3.12.0
+    GIT_SHALLOW TRUE
+  )
+  FetchContent_MakeAvailable(nlohmann_json)
+endif()
 
-# Fetch boost
-FetchContent_Declare(Boost
-    GIT_REPOSITORY https://github.com/boostorg/boost.git
-    GIT_SHALLOW 1
-    GIT_TAG boost-1.91.0-1
-)
-set(BOOST_INCLUDE_LIBRARIES program_options)
-set(BOOST_ENABLE_CMAKE ON)
+find_package(Boost CONFIG COMPONENTS program_options)
+if(NOT Boost_FOUND)
+  FetchContent_Declare(
+    Boost
+    GIT_REPOSITORY https://github.com/boostorg/boost
+    GIT_TAG boost-1.92.0
+    GIT_SHALLOW TRUE
+  )
+  FetchContent_MakeAvailable(Boost)
+endif()
 
-FetchContent_MakeAvailable(Boost)
-
-# Add subdirectories
-add_subdirectory(lib)
-add_subdirectory(src)
+add_subdirectory(src bin)
